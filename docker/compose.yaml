@@ -1,0 +1,12 @@
+services:
+  laravel:
+    image: docker-laravel
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: docker-laravel
+    ports:
+      - "80:80"
+#    restart: always
+    volumes:
+      - ../:/var/www/laravel
