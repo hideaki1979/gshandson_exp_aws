@@ -5,12 +5,23 @@ RUN apt-get update && apt-get install -y \
     curl \
     git \
     unzip \
+    libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libonig-dev \
+    pkg-config \
     && rm -rf /var/lib/apt/lists/*
+
+# PHP拡張
+RUN docker-php-ext-configure zip && \
+    docker-php-ext-install -j$(nproc) pdo_mysql mbstring zip opcache
 
 # Node.js 24.x をインストール（NodeSourceリポジトリを使用）
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
     apt-get install -y nodejs && \
     rm -rf /var/lib/apt/lists/*
+
 
 # www-dataユーザーのUIDを1001に変更(Amazon Linux 2023に揃える）
 RUN usermod -u 1001 www-data && \
@@ -20,7 +31,7 @@ RUN usermod -u 1001 www-data && \
 WORKDIR /var/www/laravel
 
 # Apacheの設定ファイルを上書き
-copy ./000-default.conf /etc/apache2/sites-available/000-default.conf
+COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
 
 # mod_rewriteを有効化（Laravelで必要）
 RUN a2enmod rewrite
